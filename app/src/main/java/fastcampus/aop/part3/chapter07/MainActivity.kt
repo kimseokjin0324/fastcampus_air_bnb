@@ -4,6 +4,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
+import androidx.viewpager2.widget.ViewPager2
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.CameraUpdate
 import com.naver.maps.map.LocationTrackingMode
@@ -29,6 +30,11 @@ class MainActivity : ComponentActivity(), OnMapReadyCallback {
     }
 
 
+    private val viewPager: ViewPager2 by lazy {
+        findViewById(R.id.houseViewPager)
+    }
+
+    private val viewPagerAdapter = HouseViewPagerAdapter()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activty_main)
@@ -37,6 +43,8 @@ class MainActivity : ComponentActivity(), OnMapReadyCallback {
         //- onMapReadyCallback이라는 인터페이스 구현체가 들어가야하는데
         //- Implement를 MainActivity에서 구현해서 this를 넣어줄수있다.
         mapView.getMapAsync(this)
+
+        viewPager.adapter = viewPagerAdapter
     }
 
     override fun onMapReady(map: NaverMap) {
@@ -78,6 +86,8 @@ class MainActivity : ComponentActivity(), OnMapReadyCallback {
                         response.body()?.let { dto ->
                             Log.d("Retrofit", dto.toString())
                             updateMarker(dto.items)
+
+                            viewPagerAdapter.submitList(dto.items)
                         }
                     }
 

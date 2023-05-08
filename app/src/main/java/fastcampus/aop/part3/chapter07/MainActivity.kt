@@ -1,8 +1,10 @@
 package fastcampus.aop.part3.chapter07
 
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
+import android.widget.TextView
 import androidx.activity.ComponentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -47,7 +49,24 @@ class MainActivity : ComponentActivity(), OnMapReadyCallback, Overlay.OnClickLis
         findViewById(R.id.currentLocationButton)
     }
 
-    private val viewPagerAdapter = HouseViewPagerAdapter()
+    private val bottomSheetTitleTextView: TextView by lazy {
+        findViewById(R.id.bottomSheetTitleTextView)
+    }
+
+    private val viewPagerAdapter = HouseViewPagerAdapter(itemClicked = {
+        //intent의 chooser를 이용해서 안드로이드의 공유기능을 리스팅이되어 다른 앱과 기능 구현이 쉽다 .
+        val intent = Intent()
+            .apply {
+                action = Intent.ACTION_SEND
+                putExtra(
+                    Intent.EXTRA_TEXT,
+                    "[지금 이 가격에 예약하세요!!] ${it.title} ${it.price} 사진보기 : ${it.imgUrl}"
+                )
+                type = "text/plain"
+            }
+        startActivity(Intent.createChooser(intent, null))
+
+    })
     private val recyclerAdapter = HouseListAdapter()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -122,6 +141,8 @@ class MainActivity : ComponentActivity(), OnMapReadyCallback, Overlay.OnClickLis
 
                             viewPagerAdapter.submitList(dto.items)
                             recyclerAdapter.submitList(dto.items)
+
+                            bottomSheetTitleTextView.text= "${dto.items.size}개의 숙소"
                         }
                     }
 
